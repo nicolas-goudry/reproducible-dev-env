@@ -1,0 +1,23 @@
+@import url('./font.css');
+
+section {
+  font-family: Ubuntu !important;
+}
+
+/* Custom page number style */
+section::after {
+  background: #eeeee4;
+  padding-inline: 0.5rem !important;
+  border-radius: 5px;
+  border: 1px solid var(--paginate-color);
+}
+
+/* Ensure transparent PNG are actually transparent */
+section img {
+  background-color: transparent !important;
+}
+
+/* Custom center aligned texts */
+section.demo_app h5 {
+  text-align: center;
+}
