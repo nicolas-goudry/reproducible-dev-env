@@ -193,7 +193,6 @@ Ok, j'ai bien bashé sur les conteneurs mais…
 
 ---
 
-<!-- ![bg right:33%](./assets/images/duality.jpg) -->
 ![bg right:33%](./assets/images/awesome-containers.png)
 
 ## Les conteneurs c'est trop génial
