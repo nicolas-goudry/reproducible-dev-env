@@ -1,0 +1,315 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Sample app">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sample app</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/themes/light.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.18.0/cdn/shoelace-autoloader.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body {
+        height: 100%;
+        min-height: 100%;
+        max-height: 100%;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        font-family: Ubuntu, var(--sl-font-sans);
+        font-size: var(--sl-font-size-medium);
+        letter-spacing: var(--sl-letter-spacing-loose);
+        line-height: var(--sl-line-height-dense);
+        color: var(--sl-color-blue-900);
+        background-color: var(--sl-color-sky-50);
+      }
+
+      body {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        grid-template-rows: 1fr;
+      }
+
+      .sidebar, .messages {
+        overflow: hidden;
+      }
+
+      .sidebar {
+        display: grid;
+        grid-template-columns: auto var(--sl-spacing-3x-large);
+        grid-template-rows: max-content auto;
+        box-shadow: var(--sl-shadow-medium);
+        z-index: 10;
+        padding-inline: var(--sl-spacing-small);
+        padding-block: var(--sl-spacing-x-small);
+      }
+
+      .sidebar > h3 {
+        display: inline-flex;
+        align-items: center;
+      }
+
+      .sidebar > sl-icon-button {
+        display: flex;
+        align-items: center;
+        justify-self: right;
+      }
+
+      sl-dialog::part(title), sl-dialog::part(body) {
+        padding-block: var(--sl-spacing-small);
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sl-spacing-medium);
+      }
+
+      sl-dialog::part(footer) {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      sl-input::part(form-control-label) {
+        margin-bottom: var(--sl-spacing-x-small);
+      }
+
+      sl-switch::part(label) {
+        margin-inline-start: var(--sl-spacing-small);
+      }
+
+      .conversations {
+        justify-self: stretch;
+        grid-column: span 2;
+        display: flex;
+        flex-direction: column;
+        gap: var(--sl-spacing-3x-small);
+        margin-top: var(--sl-spacing-small);
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .conversations::-webkit-scrollbar {
+        display: none;
+      }
+
+      .conversation {
+        display: flex;
+        border: 1px solid var(--sl-color-neutral-200);
+        border-radius: var(--sl-spacing-2x-small);
+        transition: border-color 200ms ease-in-out;
+        margin-bottom: var(--sl-spacing-2x-small);
+      }
+
+      .conversation:hover, .conversation:focus {
+        border-color: var(--sl-color-blue-400);
+        cursor: pointer;
+      }
+
+      .conversation > .content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        justify-content: space-between;
+        overflow: hidden;
+      }
+
+      .conversation > .content, .conversation > .parameters {
+        padding: var(--sl-spacing-x-small);
+      }
+
+      .conversation > .content > .title {
+        font-size: var(--sl-font-size-medium);
+        color: var(--sl-color-neutral-950);
+      }
+
+      .conversation > .content > .last-msg-preview {
+        font-size: var(--sl-font-size-x-small);
+        color: var(--sl-color-neutral-400);
+        /* font-style: italic; */
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .conversation > .parameters {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
+      .messages {
+        background-color: var(--sl-color-blue-50);
+        display: grid;
+        grid-template-rows: max-content auto max-content;
+      }
+
+      .messages header {
+        display: flex;
+        background-color: var(--sl-color-sky-50);
+        padding-inline: var(--sl-spacing-small);
+        padding-block: var(--sl-spacing-x-small);
+        gap: var(--sl-spacing-x-small);
+        z-index: 9;
+        box-shadow: var(--sl-shadow-medium);
+        align-items: center;
+      }
+
+      .messages header h3 {
+        flex: 1;
+      }
+
+      .messages header sl-avatar {
+        display: inline-flex;
+        --size: var(--sl-spacing-large);
+      }
+
+      .messages header .status-dot {
+        position: relative;
+        width: var(--sl-spacing-small);
+        height: var(--sl-spacing-small);
+        background-color: var(--sl-color-green-500);
+        border-radius: 50%;
+      }
+
+      .messages header .status-text {
+        font-size: var(--sl-font-size-x-small);
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h3>Conversations</h3>
+      <sl-dialog label="Settings" class="settings-dialog">
+        <form id="settings" name="settings" class="input-validation-required">
+          <sl-input name="username" label="Username" placeholder="Set the username shown to others" required></sl-input>
+          <sl-switch name="status" checked>Show my online status</sl-switch>
+        </form>
+        <sl-button slot="footer" variant="default" data-action="cancel">Cancel</sl-button>
+        <sl-button slot="footer" variant="primary" type="submit" form="settings">Save</sl-button>
+      </sl-dialog>
+      <sl-icon-button name="gear" label="Settings"></sl-icon-button>
+      <section class="conversations">
+        <div class="conversation">
+          <div class="content">
+            <div class="title">Somebody</div>
+            <div class="last-msg-preview">Lorem ipsum dolor sit amet. Something like that, whatever anyway bla bla bla.</div>
+          </div>
+          <div class="parameters">
+            <sl-dialog label="Somebody" class="conversation-dialog">
+              <form id="conversation-settings-somebody" name="conversation-settings-somebody" class="input-validation-required">
+                <sl-input name="nickname" label="Nickname" placeholder="Set a nickname for Somebody"></sl-input>
+                <sl-switch name="show-status" checked>Allow to see my online status</sl-switch>
+                <sl-switch name="show-typing" checked>Show when I’m typing</sl-switch>
+              </form>
+              <sl-button slot="footer" variant="danger" data-action="delete">Delete conversation</sl-button>
+              <sl-button slot="footer" variant="primary" type="submit" form="conversation-settings-somebody">Save</sl-button>
+              <sl-dialog label="Confirm deletion" class="confirm-dialog">
+                <span>Are you sure you want to delete conversation with Somebody?</span>
+                <sl-button slot="footer" variant="default" data-action="cancel">Cancel</sl-button>
+                <sl-button slot="footer" variant="danger" data-action="confirm">Confirm</sl-button>
+              </sl-dialog>
+            </sl-dialog>
+            <sl-icon-button name="three-dots-vertical" label="Parameters"></sl-icon-button>
+          </div>
+        </div>
+      </section>
+    </aside>
+    <section class="messages">
+      <header>
+        <sl-avatar label="Somebody"></sl-avatar>
+        <h3>Somebody</h3>
+        <div class="status-text">online</div>
+        <div class="status-dot"></div>
+      </header>
+      <main>messages</main>
+      <footer>input bar</footer>
+    </section>
+    <script type="module">
+      const dialogs = document.querySelectorAll(".conversation-dialog");
+
+      for (const dialog of [...dialogs]) {
+        const formId = dialog.querySelector("form").id
+        const confirmDialog = dialog.querySelector('.confirm-dialog')
+        const openButton = dialog.nextElementSibling;
+        const deleteButton = dialog.querySelector('sl-button[data-action="delete"]');
+        const confirmDeleteButton = confirmDialog.querySelector('sl-button[data-action="confirm"]');
+        const cancelDeleteButton = confirmDialog.querySelector('sl-button[data-action="cancel"]');
+
+        openButton.addEventListener("click", () => dialog.show());
+        deleteButton.addEventListener("click", () => {
+          confirmDialog.show()
+        });
+        confirmDeleteButton.addEventListener("click", () => {
+          console.log("Should delete conversation")
+          confirmDialog.hide()
+          dialog.hide()
+        })
+        cancelDeleteButton.addEventListener("click", () => {
+          confirmDialog.hide()
+        })
+
+        const settingsForm = document.forms[formId];
+        await Promise.all([
+          customElements.whenDefined('sl-button'),
+          customElements.whenDefined('sl-switch'),
+          customElements.whenDefined('sl-input'),
+        ]).then(() => {
+          settingsForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const data = new FormData(settingsForm);
+            const nickname = data.get("nickname");
+            const showStatus = Boolean(data.get("show-status"));
+            const showTyping = Boolean(data.get("show-typing"));
+
+            console.log("Should send data to backend");
+            console.group("data");
+            console.log("Nickname: ", nickname);
+            console.log("Show online status: ", showStatus);
+            console.log("Show when typing: ", showTyping);
+            console.groupEnd();
+            dialog.hide();
+          });
+        });
+      }
+    </script>
+    <script type="module">
+      const dialog = document.querySelector(".settings-dialog");
+      const openButton = dialog.nextElementSibling;
+      const closeButton = dialog.querySelector('sl-button[data-action="cancel"]');
+
+      openButton.addEventListener("click", () => dialog.show());
+      closeButton.addEventListener("click", () => dialog.hide());
+
+      const settingsForm = document.forms.settings;
+      await Promise.all([
+        customElements.whenDefined('sl-button'),
+        customElements.whenDefined('sl-switch'),
+        customElements.whenDefined('sl-input'),
+      ]).then(() => {
+        settingsForm.addEventListener('submit', event => {
+          event.preventDefault();
+          const data = new FormData(settingsForm);
+          const username = data.get("username");
+          const showStatus = Boolean(data.get("status"));
+
+          console.log("Should send data to backend");
+          console.group("data");
+          console.log("Username: ", username);
+          console.log("Show online status: ", showStatus);
+          console.groupEnd();
+          dialog.hide();
+        });
+      });
+    </script>
+  </body>
+</html>
