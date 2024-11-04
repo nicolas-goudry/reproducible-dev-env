@@ -6,10 +6,10 @@ Ce dépôt contient les fichiers sources de la présentation.
 
 Le contenu de la présentation se trouve dans le fichier [`slides.md`](./slides.md). Elle utilise [Marpit](https://marpit.marp.app) pour gérer et générer le jeu de slides.
 
-Les ressources additionnelles se trouvent dans le dossier [`assets`](./assets), lui-même composé de sous-dossiers:
+Les ressources additionnelles se trouvent dans le dossier [`assets`](./assets), lui-même composé de sous-dossiers :
 
-- [`assets/font`](./slides/assets/font): fichiers de la police de caractère utilisée pour la présentation
-- [`assets/images`](./slides/assets/images): images utilisées pour la présentation
+- [`assets/font`](./slides/assets/font) : fichiers de la police de caractère utilisée pour la présentation
+- [`assets/images`](./slides/assets/images) : images utilisées pour la présentation
 
 Dans le dossier `assets`, on trouvera également quelques lignes de CSS pour personnaliser le rendu de Marpit.
 
