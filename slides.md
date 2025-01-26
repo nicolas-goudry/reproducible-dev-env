@@ -55,10 +55,10 @@ On va quand même passer rapidement sur les bases des conteneurs, mais promis : 
 
 ## Les conteneurs… Quèsaco ?
 
-- forme de virtualisation embarquant le code et les dépendances d'une application
-- reproductible
-- utilise les ressources physiques de l'hôte (ainsi que son noyau)
-- isolé du système hôte et de ses applications
+* forme de virtualisation embarquant le code et les dépendances d'une application
+* reproductible
+* utilise les ressources physiques de l'hôte (ainsi que son noyau)
+* isolé du système hôte et de ses applications
 
 <!--
 Les conteneurs, on les connait depuis un bon moment maintenant
@@ -75,10 +75,14 @@ Là où les conteneurs se démarquent, c'est par leur simplicité d'utilisation
 
 --break--
 
-Pour ceux qui n'ont pas lu la slide pendant ces quelques secondes d'histoire (merci pour votre attention)
+Du coup, c'est quoi les conteneurs ?
+
+--next--
 
 Les conteneurs sont une forme de virtualisation dans laquelle on embarque le code et les dépendances d'une application
 Une sorte de petite boîte noire qui contient tout ce que notre code a besoin pour être exécuté
+
+--next--
 
 La plupart du temps, les conteneurs sont reproductibles, fini l'excuse du “oui mais ça fonctionne chez moi”
 Pourtant, on voit souvent des images de conteneurs qui ne sont pas très reproductibles :
@@ -86,7 +90,12 @@ Pourtant, on voit souvent des images de conteneurs qui ne sont pas très reprodu
 - l'image de base utilise un tag “mouvant” (qui se déplace entre différentes itérations de l'image)
 - etc…
 
+--next--
+
 Enfin, les conteneurs utilisent les ressources de leur hôte (CPU, RAM, disque, noyau)
+
+--next--
+
 Et ils sont isolés du système et des applications utilisateurs
 Un peu de la même manière que chroot
 
@@ -159,17 +168,22 @@ En théorie, tout ça devrait bien fonctionner, et pourtant je vois plusieurs pr
 
 ## Les “problèmes” de cette approche
 
-- moteur de conteneur requis
-- temps de compilation/transpilation et rechargement à chaud
-- mise en réseau _(sans compose)_
-- accès aux services depuis l'hôte
+* moteur de conteneur requis
+* temps de compilation/transpilation et rechargement à chaud
+* mise en réseau _(sans compose)_
+* accès aux services depuis l'hôte
 
 <!--
+
+--next--
+
 Le premier problème, c'est qu'on a besoin d'un moteur de conteneur justement
 Un truc qui sache comment exécuter ces fameux conteneurs (docker, containerd, nerdctl, podman, you name it)
 Et je ne vous parle même pas de Docker Desktop
 Un outil de plus à installer, qui va encore bouffer notre RAM et notre CPU
 Pas cool quand on a déjà 36 instances de Chrome avec des centaines d'onglets
+
+--next--
 
 Deuxième problème, le plus contraignant quand on fait du dev, c'est qu'il faut construire une image de conteneur
 Et ça peut prendre longtemps, trèèès longtemps même selon la stack utilisé (dédicace à Java et à Node.js)
@@ -177,9 +191,13 @@ Et ça peut prendre longtemps, trèèès longtemps même selon la stack utilisé
 Et justement, si on parle d'application web, on peut dire adieu au “hot reload”
 Bon, ok, ça on peut le conserver en utilisant des tours de passe-passe avec les volumes et un peu de bash saupoudré d'inotify
 
+--next--
+
 En plus, si on décide de ne pas utiliser compose, on va avoir de nouveaux problèmes
 Parce que, mettre en réseau des conteneurs sans compose, c'est relou. Il faut créer un réseau, dire de quel type il est, tout bien configurer
 Et je ne vous parle même pas des certificats TLS
+
+--next--
 
 Et l'accès aux services depuis l'hôte ? Aussi simple que d'exposer un port ?
 Si le cas d'usage est basique : oui
@@ -224,16 +242,20 @@ Du coup, c'est quoi les alternatives ? Ben il y en a plusieurs.
 
 # Les alternatives
 
-- lancement des services “brut”
-- [nix](https://nix.dev/), [flakes](https://nix.dev/concepts/flakes.html) & [direnv](https://direnv.net/)
-- [flox](https://flox.dev/) / [devbox](https://www.jetify.com/devbox) / [devenv](https://devenv.sh/)
+* lancement des services “brut”
+* [nix](https://nix.dev/), [flakes](https://nix.dev/concepts/flakes.html) & [direnv](https://direnv.net/)
+* [flox](https://flox.dev/) / [devbox](https://www.jetify.com/devbox) / [devenv](https://devenv.sh/)
 
 <!--
 Déjà, on va partir du principe que quand on dev, l'isolation apportée par les conteneurs, on s'en fout quand même royalement
 
+--next--
+
 Du coup, on pourrait simplement tout lancer en “brut” sur notre poste
 Mais dans ce cas là, on oublie la reproductibilité et on en revient à “ça fonctionne sur ma machine”
 C'est dommage et c'est pas ce qu'on cherche à faire, du coup on écarte cette solution tout de suite
+
+--next--
 
 On en vient au vif du sujet : des solutions entièrement reproductibles, avec un degré variable de complexité
 Avant de vous parler de ces solutions : qui connaît Nix ici ? NIX, pas Unix
@@ -241,6 +263,8 @@ Avant de vous parler de ces solutions : qui connaît Nix ici ? NIX, pas Unix
 La première solution qu'on va explorer, c'est un peu comme Kubernetes the hard way pour ceux qui connaissent
 Mais ça a l'avantage d'être hyper flexible
 On va d'abord voir comment on peut tirer parti de nix (avec les flakes activés) en l'associant à direnv
+
+--next--
 
 Ensuite, une fois qu'on aura pleuré du sang et transpiré des larmes, on va voir des solutions beaucoup plus friendly
 Toutes ces solutions utilisent Nix under the hood, c'est d'ailleurs pour ça qu'on va commencer par la méthode Viking
