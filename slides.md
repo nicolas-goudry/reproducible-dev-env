@@ -3,7 +3,7 @@
 command -v nix-shell &>/dev/null || { echo "Nix is required to run this script! Visit https://nixos.org/download/"; exit; }
 nixpkgs=64b80bfb316b57cdb8919a9110ef63393d74382a
 packages=( coreutils marp-cli inotify-tools )
-command=( tail -n+13 "$1" "|" marp -o "${1%.md}".html "${@:2}" )
+command=( tail -n+13 "$1" "|" marp --bespoke.transition -o "${1%.md}".html "${@:2}" )
 nixcmd=( nix-shell --pure -p "${packages[@]}" -I nixpkgs=https://github.com/nixos/nixpkgs/archive/$nixpkgs.tar.gz --run )
 if [[ " $* " =~ [[:space:]]-w[[:space:]] ]]; then echo "Watch required"; watch=true; fi
 command="${command[*]//--watch/}"; command="${command//-w/}"
@@ -17,6 +17,7 @@ author: Nicolas Goudry
 affiliation: https://github.com/nicolas-goudry
 theme: default
 paginate: true
+transition: coverflow
 backgroundColor: #eeeee4
 style: |
   @import url('./assets/index.css');
